@@ -41,6 +41,7 @@
             "expanded": true,
             "pages": [
               "sql-tools/overview",
+              "sql-tools/built-in-tools",
               {
                 "group": "Tool Reference",
                 "expanded": false,
@@ -53,6 +54,33 @@
               "sql-tools/parameter-guide",
               "sql-tools/output-formats",
               "sql-tools/using-default-tools"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "cli/overview",
+              "cli/getting-started"
+            ]
+          },
+          {
+            "group": "Usage Guide",
+            "pages": [
+              "cli/commands",
+              "cli/configuration",
+              "cli/output-formats",
+              "cli/yaml-tools"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "cli/agent-integration"
             ]
           }
         ]

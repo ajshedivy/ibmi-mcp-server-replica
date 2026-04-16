@@ -2,6 +2,93 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5](https://github.com/IBM/ibmi-mcp-server/compare/v0.4.4...v0.4.5) (2026-03-24)
+
+
+### Features
+
+* **`ibmi describe` command**: Generate DDL (CREATE statements) for one or more SQL objects using `QSYS2.GENERATE_SQL`. Accepts comma-delimited `LIBRARY.OBJECT` references with an optional `--type` flag for views, indexes, procedures, and other object types ([#132](https://github.com/IBM/ibmi-mcp-server/issues/132))
+* **Multi-system SQL execution**: Run the same SQL query against multiple IBM i systems in parallel with `ibmi sql "..." --system dev,prod`. Results include a `SYSTEM` column and per-system timing. JSON output provides an aggregate envelope with `systems_ok`/`systems_failed` counts ([#132](https://github.com/IBM/ibmi-mcp-server/issues/132))
+
+
+### Bug Fixes
+
+* **Container security**: Update Dockerfile base image and apply OS-level package upgrades to resolve CVEs in `libcrypto3`, `libssl3`, and bundled npm dependencies (`minimatch`, `tar`, `glob`, `cross-spawn`, `flatted`) ([#134](https://github.com/IBM/ibmi-mcp-server/issues/134))
+
+### [0.4.4](https://github.com/IBM/ibmi-mcp-server/compare/v0.4.3...v0.4.4) (2026-03-15)
+
+
+### Bug Fixes
+
+* **CLI Database Commands**: Fix `ibmi sql` and other database commands failing with "Db2i configuration not found" when run from directories without a `.env` file. The global config (`~/.ibmi/config.yaml`) now correctly provides credentials to all CLI commands regardless of working directory ([#131](https://github.com/IBM/ibmi-mcp-server/issues/131))
+
+### [0.4.3](https://github.com/IBM/ibmi-mcp-server/compare/v0.4.2...v0.4.3) (2026-03-15)
+
+
+### Features
+
+* **config:** add walk-up boundary and ibmi config show command ([#130](https://github.com/IBM/ibmi-mcp-server/issues/130)) ([d050991](https://github.com/IBM/ibmi-mcp-server/commit/d050991ae578105800adb63d3b5330c674b04956))
+
+
+### Bug Fixes
+
+* audit npm security fixes ([ecb451a](https://github.com/IBM/ibmi-mcp-server/commit/ecb451ad9f4a44d7c0dfc5b7ea5394db867056e8))
+
+### [0.4.2](https://github.com/IBM/ibmi-mcp-server/compare/v0.4.1...v0.4.2) (2026-03-09)
+
+
+### Bug Fixes
+
+* **`--builtin-tools` CLI Flag**: Fix `--builtin-tools` flag not registering the default text-to-SQL toolset. ES module evaluation timing caused tool definitions to be captured before CLI overrides were applied; tool registration now defers config evaluation to runtime ([2134d79](https://github.com/IBM/ibmi-mcp-server/commit/2134d79f8be14e2e37637d9f10bb87da2b2e38be))
+
+* **UDTF Column Validation Transparency**: `validate_query` now reports columns from UDTF output (e.g., `TABLE(SYSTOOLS.AUDIT_JOURNAL_CP(...))`) as "skipped" instead of silently passing validation. Skipped columns are surfaced in the response so users can manually verify they match the function's result set ([2134d79](https://github.com/IBM/ibmi-mcp-server/commit/2134d79f8be14e2e37637d9f10bb87da2b2e38be))
+
+### [0.4.1](https://github.com/IBM/ibmi-mcp-server/compare/v0.4.0...v0.4.1) (2026-03-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cli:** IBMI_ENABLE_DEFAULT_TOOLS now defaults to false. Users
+who relied on the default text-to-SQL toolset must pass --builtin-tools
+or set IBMI_ENABLE_DEFAULT_TOOLS=true.
+
+Signed-off-by: Adam Shedivy <ajshedivyaj@gmail.com>
+
+### Features
+
+* **cli:** add --builtin-tools and --execute-sql flags with opt-in defaults ([4437369](https://github.com/IBM/ibmi-mcp-server/commit/443736912b2c905acc43d394915e3f435611252a))
+* **env:** update .env.example with new tool configurations and rate limiting settings ([f2bbd12](https://github.com/IBM/ibmi-mcp-server/commit/f2bbd12a5ea283470b3fc86adc9bd3e3aaf025be))
+
+## [0.4.0](https://github.com/IBM/ibmi-mcp-server/compare/v0.3.2...v0.4.0) (2026-03-06)
+
+
+### Features
+
+* **IBM i CLI**: New command-line interface for querying and managing IBM i systems directly from the terminal. Includes multi-system configuration, YAML tool execution, and an interactive agent mode for natural language workflows ([#126](https://github.com/IBM/ibmi-mcp-server/issues/126))
+* **Default Text-to-SQL Toolset**: Ship a built-in toolset with paginated result support, enabling AI agents to query IBM i databases out of the box without custom YAML configuration ([#120](https://github.com/IBM/ibmi-mcp-server/issues/120))
+
+
+### Bug Fixes
+
+* **Security Dependency Updates**: Patch `hono` (4.11.4 → 4.12.5) and `@hono/node-server` (1.19.7 → 1.19.11) to fix arbitrary file access via serveStatic, authorization bypass via encoded slashes, SSE injection, and cookie attribute injection vulnerabilities ([#341](https://github.com/IBM/ibmi-mcp-server/issues/341), [#342](https://github.com/IBM/ibmi-mcp-server/issues/342), [#343](https://github.com/IBM/ibmi-mcp-server/issues/343), [#344](https://github.com/IBM/ibmi-mcp-server/issues/344))
+
+
+### Documentation
+
+* **CLI Reference Guide**: Add comprehensive CLI documentation with 7 pages covering getting started, commands, configuration, YAML tools, output formats, and agent integration ([#127](https://github.com/IBM/ibmi-mcp-server/issues/127))
+
+### [0.3.2](https://github.com/IBM/ibmi-mcp-server/compare/v0.3.1...v0.3.2) (2026-03-04)
+
+
+### Features
+
+* **Connection Pool Timeouts**: Configure idle connection cleanup and per-query timeouts to prevent resource leaks and long-running queries. Set `IBMI_POOL_IDLE_TIMEOUT_MS` and `IBMI_POOL_QUERY_TIMEOUT_MS` environment variables to tune pool behavior for your workload ([#121](https://github.com/IBM/ibmi-mcp-server/issues/121)), closes [#117](https://github.com/IBM/ibmi-mcp-server/issues/117)
+
+
+### Documentation
+
+* **Container Deployment Guide**: Add comprehensive instructions for running the MCP server in Docker, Podman, and OpenShift containers, including multi-architecture image support ([#116](https://github.com/IBM/ibmi-mcp-server/issues/116))
+
 ### [0.3.1](https://github.com/IBM/ibmi-mcp-server/compare/v0.3.0...v0.3.1) (2026-02-22)
 
 

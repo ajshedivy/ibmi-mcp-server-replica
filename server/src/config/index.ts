@@ -341,6 +341,13 @@ const EnvSchema = z.object({
     .default("true")
     .transform((val) => val === "true" || val === "1"),
 
+  /** Enable built-in default tools for text-to-SQL workflows (list_schemas, list_tables_in_schema, get_table_columns, validate_query). */
+  IBMI_ENABLE_DEFAULT_TOOLS: z
+    .string()
+    .optional()
+    .default("false")
+    .transform((val) => val === "true" || val === "1"),
+
   // --- START: Rate Limiting Configuration ---
   /** Enable or disable HTTP rate limiting. Default: true. */
   MCP_RATE_LIMIT_ENABLED: z
@@ -350,18 +357,10 @@ const EnvSchema = z.object({
     .transform((val) => val === "true" || val === "1"),
 
   /** Maximum requests allowed per rate limit window. Default: 100. */
-  MCP_RATE_LIMIT_MAX_REQUESTS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(100),
+  MCP_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
 
   /** Rate limit window duration in milliseconds. Default: 900000 (15 minutes). */
-  MCP_RATE_LIMIT_WINDOW_MS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(900_000),
+  MCP_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
 
   /** Skip rate limiting when NODE_ENV=development. Default: false. */
   MCP_RATE_LIMIT_SKIP_DEV: z
@@ -568,16 +567,28 @@ export const config = {
     logLevel: env.OTEL_LOG_LEVEL,
   },
 
-  /** IBM i DB2 configuration. Undefined if no related env vars are set. */
-  db2i:
-    env.DB2i_HOST && env.DB2i_USER && env.DB2i_PASS
-      ? {
-          host: env.DB2i_HOST,
-          user: env.DB2i_USER,
-          password: env.DB2i_PASS,
-          ignoreUnauthorized: env.DB2i_IGNORE_UNAUTHORIZED,
-        }
-      : undefined,
+  /**
+   * IBM i DB2 configuration. Undefined if no related env vars are set.
+   *
+   * Implemented as a getter so the CLI can set DB2i_* env vars at runtime
+   * (via connectSystem) after the config module has already been imported
+   * through the static import chain (logger → utils → config).
+   */
+  get db2i():
+    | { host: string; user: string; password: string; ignoreUnauthorized: boolean }
+    | undefined {
+    const host = process.env.DB2i_HOST;
+    const user = process.env.DB2i_USER;
+    const password = process.env.DB2i_PASS;
+    if (!host || !user || !password) return undefined;
+    const ignoreRaw = process.env.DB2i_IGNORE_UNAUTHORIZED ?? "true";
+    return {
+      host,
+      user,
+      password,
+      ignoreUnauthorized: ignoreRaw === "true" || ignoreRaw === "1",
+    };
+  },
 
   /** Path to YAML tools configuration file. From `TOOLS_YAML_PATH`. */
   toolsYamlPath: env.TOOLS_YAML_PATH,
@@ -611,6 +622,7 @@ export const config = {
     .filter(Boolean) as string[] | undefined,
   ibmi_enableExecuteSql: env.IBMI_ENABLE_EXECUTE_SQL,
   ibmi_executeSqlReadonly: env.IBMI_EXECUTE_SQL_READONLY,
+  ibmi_enableDefaultTools: env.IBMI_ENABLE_DEFAULT_TOOLS,
 
   /** Rate limiting configuration for HTTP transport. From `MCP_RATE_LIMIT_*` environment variables. */
   rateLimit: {

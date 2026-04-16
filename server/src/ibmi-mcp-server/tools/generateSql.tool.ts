@@ -24,7 +24,7 @@ import type { SdkContext } from "../../mcp-server/tools/utils/types.js";
 /**
  * Supported IBM i database object types for DDL generation.
  */
-const OBJECT_TYPES = [
+export const OBJECT_TYPES = [
   "ALIAS",
   "CONSTRAINT",
   "FUNCTION",
@@ -336,7 +336,7 @@ export const generateSqlTool = defineTool({
   name: "describe_sql_object",
   title: "Generate SQL DDL",
   description:
-    "Describes IBM i database objects by generating their SQL DDL statements. Useful for understanding object structure and recreating objects.",
+    "Generate the SQL DDL statement for an IBM i database object. Use this to see the full CREATE definition of a table, view, index, procedure, function, or other object.",
   inputSchema: GenerateSqlInputSchema,
   outputSchema: GenerateSqlOutputSchema,
   logic: generateSqlLogic,
